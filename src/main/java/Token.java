@@ -1,3 +1,8 @@
+/*
+ Vitor Hugo Nascimento Pinto - 201535008
+ Weslley Nascimento Araujo - 201535001
+*/
+
 public class Token {
     public int l, c;
     public TOKEN_TYPE token_type;

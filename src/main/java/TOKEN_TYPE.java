@@ -1,6 +1,8 @@
-/**
- * Definição dos tipos de Token da linguagem lang.
- */
+/*
+ Vitor Hugo Nascimento Pinto - 201535008
+ Weslley Nascimento Araujo - 201535001
+*/
+
 public enum TOKEN_TYPE {
     IDENTIFIER,
     TYPE_NAME,

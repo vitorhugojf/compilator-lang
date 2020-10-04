@@ -1,3 +1,8 @@
+/*
+ Vitor Hugo Nascimento Pinto - 201535008
+ Weslley Nascimento Araujo - 201535001
+*/
+
 import java.io.FileReader;
 import java.io.IOException;
 
