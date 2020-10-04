@@ -4,7 +4,7 @@ public class Token {
     public String lexeme;
     public Object info;
 
-    public Token(int l, int c, TOKEN_TYPE token_type, String lexeme, Object info) {
+    public Token(TOKEN_TYPE token_type, String lexeme, Object info, int l, int c) {
         this.l = l;
         this.c = c;
         this.token_type = token_type;
@@ -12,14 +12,14 @@ public class Token {
         this.info = info;
     }
 
-    public Token(int l, int c, TOKEN_TYPE token_type, String lexeme) {
+    public Token(TOKEN_TYPE token_type, String lexeme, int l, int c) {
         this.l = l;
         this.c = c;
         this.token_type = token_type;
         this.lexeme = lexeme;
     }
 
-    public Token(int l, int c, TOKEN_TYPE token_type, Object info) {
+    public Token(TOKEN_TYPE token_type, Object info, int l, int c) {
         this.l = l;
         this.c = c;
         this.token_type = token_type;

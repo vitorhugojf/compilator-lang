@@ -1,38 +1,37 @@
-import java_cup.runtime.*;
-
 %%
 
-%class Lexer
 %unicode
-%cup
 %line
 %column
+%class Lexer
 %function nextToken
 %type Token
 
 %{
-  StringBuffer string = new StringBuffer();
-
-  private int ntk = 0;
+  private int ntk;
 
   public int readedTokens(){
       return ntk;
   }
 
-  private Token symbol(int type) {
+  private Token symbol(TOKEN_TYPE type) {
     ntk++;
-    return new Symbol(type, yyline+1 , yycolumn+1 );
+    return new Token(type, yytext(), yyline+1 , yycolumn+1 );
   }
 
-  private Token symbol(int type, Object value) {
+  private Token symbol(TOKEN_TYPE type, Object value) {
     ntk++;
-    return new Symbol(type, yyline+1 , yycolumn+1 , value);
+    return new Token(type, value, yyline+1 , yycolumn+1);
   }
 %}
 
+%init{
+    ntk = 0;
+%init}
+
 LineTerminator = \r|\n|\r\n
 number = [:digit:] [:digit:]*
-identifier = [:lowercase:]
+Identifier = [:lowercase:]
 InputCharacter = [^\r\n]
 WhiteSpace     = {LineTerminator} | [ \t\f]
 /* comments */
@@ -42,21 +41,17 @@ TraditionalComment   = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 EndOfLineComment     = "//" {InputCharacter}* {LineTerminator}?
 DocumentationComment = "/**" {CommentContent} "*"+ "/"
 CommentContent       = ( [^*] | \*+ [^/*] )*
-Identifier = [:jletter:] [:jletterdigit:]*
-DecIntegerLiteral = 0 | [1-9][0-9]*
 
 %%
 
 /* keywords */
-<YYINITIAL> "abstract"              { return symbol(sym.ABSTRACT); }
-<YYINITIAL> "boolean"               { return symbol(sym.BOOLEAN); }
-<YYINITIAL> "break"                 { return symbol(sym.BREAK); }
+<YYINITIAL> "abstract"              { return symbol(TOKEN_TYPE.ABSTRACT); }
+<YYINITIAL> "boolean"               { return symbol(TOKEN_TYPE.BOOLEAN); }
+<YYINITIAL> "break"                 { return symbol(TOKEN_TYPE.BREAK); }
 
 <YYINITIAL> {
   {Identifier}                      { return symbol(TOKEN_TYPE.IDENTIFIER); }
   {number}                          { return symbol(TOKEN_TYPE.NUM, Integer.parseInt(yytext())); }
-  {DecIntegerLiteral}               { return symbol(TOKEN_TYPE.INTEGER_LITERAL); }
-  \"                                { string.setLength(0); yybegin(STRING); }
 
   "="                               { return symbol(TOKEN_TYPE.EQ); }
   ";"                               { return symbol(TOKEN_TYPE.SEMI); }

@@ -4,7 +4,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String args[]) {
         try{
-            Lexer lexer = new Lexer(new FileReader(args[0]));
+            Lexer lexer = new Lexer(new FileReader("sample.txt"));
             Token t = lexer.nextToken();
             while (t != null) {
                 System.out.println(t.toString());

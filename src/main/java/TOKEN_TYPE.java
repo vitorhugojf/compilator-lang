@@ -7,7 +7,6 @@ public enum TOKEN_TYPE {
     BREAK,
     IDENTIFIER,
     NUM,
-    INTEGER_LITERAL,
     EQ,
     SEMI,
     TIMES,
