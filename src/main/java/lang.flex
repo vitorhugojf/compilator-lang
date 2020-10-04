@@ -29,38 +29,74 @@
     ntk = 0;
 %init}
 
-LineTerminator = \r|\n|\r\n
-number = [:digit:] [:digit:]*
-Identifier = [:lowercase:]
-InputCharacter = [^\r\n]
+/* operators */
+Identifier = [:lowercase:] ({Char} | "_" | [:digit:])*
+TypeName = [:uppercase:][:lowercase:]*
+Integer = [:digit:] [:digit:]*
+Float = [:digit:]* "." [:digit:][:digit:]*
+Literal = "\'" ({Char} | "\\n" | "\\t" | "\\b" | "\\r") "\'"
+Char = [:uppercase:] | [:lowercase:]
+Boolean = ("true" | "false")
+Null = "null"
+
 WhiteSpace     = {LineTerminator} | [ \t\f]
+LineTerminator = \r|\n|\r\n
+
 /* comments */
-Comment = {TraditionalComment} | {EndOfLineComment} | {DocumentationComment}
-TraditionalComment   = "/*" [^*] ~"*/" | "/*" "*"+ "/"
-// Comment can be the last line of the file, without line terminator.
-EndOfLineComment     = "//" {InputCharacter}* {LineTerminator}?
-DocumentationComment = "/**" {CommentContent} "*"+ "/"
-CommentContent       = ( [^*] | \*+ [^/*] )*
+%state COMMENT
+%state LINE_COMMENT
 
 %%
 
-/* keywords */
-<YYINITIAL> "abstract"              { return symbol(TOKEN_TYPE.ABSTRACT); }
-<YYINITIAL> "boolean"               { return symbol(TOKEN_TYPE.BOOLEAN); }
-<YYINITIAL> "break"                 { return symbol(TOKEN_TYPE.BREAK); }
-
 <YYINITIAL> {
   {Identifier}                      { return symbol(TOKEN_TYPE.IDENTIFIER); }
-  {number}                          { return symbol(TOKEN_TYPE.NUM, Integer.parseInt(yytext())); }
+  {TypeName}                        { return symbol(TOKEN_TYPE.TYPE_NAME); }
+  {Integer}                         { return symbol(TOKEN_TYPE.INTEGER, Integer.parseInt(yytext())); }
+  {Float}                           { return symbol(TOKEN_TYPE.FLOAT, Float.parseFloat(yytext())); }
+  {Literal}                         { return symbol(TOKEN_TYPE.LITERAL); }
+  {Char}                            { return symbol(TOKEN_TYPE.CHAR); }
+  {Boolean}                         { return symbol(TOKEN_TYPE.BOOLEAN); }
+  {Null}                            { return symbol(TOKEN_TYPE.NULL); }
 
-  "="                               { return symbol(TOKEN_TYPE.EQ); }
-  ";"                               { return symbol(TOKEN_TYPE.SEMI); }
-  "*"                               { return symbol(TOKEN_TYPE.TIMES); }
-  "=="                              { return symbol(TOKEN_TYPE.EQEQ); }
-  "+"                               { return symbol(TOKEN_TYPE.PLUS); }
-
-  {Comment}                         { /* ignore */ }
   {WhiteSpace}                      { /* ignore */ }
+  {LineTerminator}                  { /* ignore */ }
+
+  "{-"                              { yybegin(COMMENT); }
+  "--"                              { yybegin(LINE_COMMENT); }
+
+  "("                               { return symbol(TOKEN_TYPE.PARENTHESIS_OPEN); }
+  ")"                               { return symbol(TOKEN_TYPE.PARENTHESIS_CLOSE); }
+  "["                               { return symbol(TOKEN_TYPE.BRACKET_OPEN); }
+  "]"                               { return symbol(TOKEN_TYPE.BRACKET_CLOSE); }
+  "{"                               { return symbol(TOKEN_TYPE.KEYS_OPEN); }
+  "}"                               { return symbol(TOKEN_TYPE.KEYS_CLOSE); }
+  ";"                               { return symbol(TOKEN_TYPE.SEMI); }
+  "."                               { return symbol(TOKEN_TYPE.DOT); }
+  ","                               { return symbol(TOKEN_TYPE.COMMA); }
+  "="                               { return symbol(TOKEN_TYPE.EQ); }
+  "<"                               { return symbol(TOKEN_TYPE.LESS); }
+  "=="                              { return symbol(TOKEN_TYPE.EQEQ); }
+  "!="                              { return symbol(TOKEN_TYPE.NOTEQ); }
+  "+"                               { return symbol(TOKEN_TYPE.PLUS); }
+  "-"                               { return symbol(TOKEN_TYPE.MINUS); }
+  "*"                               { return symbol(TOKEN_TYPE.TIMES); }
+  "/"                               { return symbol(TOKEN_TYPE.SLASH); }
+  "%"                               { return symbol(TOKEN_TYPE.PERCENT); }
+  "&&"                              { return symbol(TOKEN_TYPE.EQCEQC); }
+  "!"                               { return symbol(TOKEN_TYPE.NOT); }
+  ":"                               { return symbol(TOKEN_TYPE.DP); }
+  "::"                              { return symbol(TOKEN_TYPE.DPDP); }
+
+}
+
+<COMMENT>{
+    "-}"        { yybegin(YYINITIAL); }
+    [^"-}"]*    {                     }
+}
+
+<LINE_COMMENT>{
+    {LineTerminator}    { yybegin(YYINITIAL); }
+    ^{LineTerminator}*  {                     }
 }
 
 /* error fallback */
