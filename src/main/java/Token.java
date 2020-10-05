@@ -33,6 +33,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return "[(" + l + ", " + c + ") \"" + "Token Type: " + token_type + " - " + (lexeme == null ? "" : lexeme) + "\" : <" + (info == null ? "" :info.toString()) + ">]";
+        return token_type + (lexeme == null ? "" :  ": " + lexeme) + (info == null ? "" : ": " + info.toString());
     }
 }
